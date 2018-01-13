@@ -1,0 +1,29 @@
+# Global settings and defaults.
+global:
+    scrape_interval: 10s
+    scrape_timeout: 10s
+    evaluation_interval: 10s
+    external_labels:
+        service: ct
+
+scrape_configs:
+    - job_name: prometheus
+      scheme: http
+      scrape_interval: "15s"
+      static_configs:
+          - targets: ['192.168.11.65:19090']
+
+    - job_name: logserver
+      scheme: http
+      static_configs:
+          - targets: ['192.168.11.65:18081']
+          - targets: ['192.168.11.65:18082']
+          - targets: ['192.168.11.65:18083']
+          
+    - job_name: etcd
+      scheme: http
+      static_configs:
+          - targets: ['192.168.11.65:14001']
+          - targets: ['192.168.11.65:14002']
+          - targets: ['192.168.11.65:14003']
+

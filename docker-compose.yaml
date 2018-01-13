@@ -1,0 +1,139 @@
+version: '2'
+services:
+    ct_log1:
+        image: ct_log
+        ports:
+            - "18081:80"
+        environment:
+            - HOSTNAME=node1
+            - ETCD_SERVERS=node1:14001,node2:14002,node3:14003
+            - PROJECT=CT
+            - MONITORING=prometheus
+            - CONTAINER_HOST=ct_log1
+        extra_hosts:
+            - "node1:192.168.11.65"
+            - "node2:192.168.11.65"
+            - "node3:192.168.11.65"
+        volumes:
+            - /mnt/data/ct/ctlog1:/mnt/ctlog
+        restart: always
+    ct_log2:
+        image: ct_log
+        ports:
+            - "18082:80"
+        environment:
+            - HOSTNAME=node2
+            - ETCD_SERVERS=node1:14001,node2:14002,node3:14003
+            - PROJECT=CT
+            - MONITORING=prometheus
+            - CONTAINER_HOST=ct_log2
+        extra_hosts:
+            - "node1:192.168.11.65"
+            - "node2:192.168.11.65"
+            - "node3:192.168.11.65"
+        volumes:
+            - /mnt/data/ct/ctlog2:/mnt/ctlog
+        restart: always
+    ct_log3:
+        image: ct_log
+        ports:
+            - "18083:80"
+        environment:
+            - HOSTNAME=node3
+            - ETCD_SERVERS=node1:14001,node2:14002,node3:14003
+            - PROJECT=CT
+            - MONITORING=prometheus
+            - CONTAINER_HOST=ct_log3
+        extra_hosts:
+            - "node1:192.168.11.65"
+            - "node2:192.168.11.65"
+            - "node3:192.168.11.65"
+        volumes:
+            - /mnt/data/ct/ctlog3:/mnt/ctlog
+        restart: always
+    etcd1:
+        image: ct_etcd
+        ports:
+            - "14001:2379"
+            - "17001:2380"
+        environment:
+            - ETCD_DISCOVERY
+        command: etcd
+                    --name=etcd-node-1
+                    --data-dir=/opt/etcd/data
+                    --heartbeat-interval=100
+                    --election-timeout=6000
+                    --listen-peer-urls=http://0.0.0.0:2380
+                    --listen-client-urls=http://0.0.0.0:2379
+                    --advertise-client-urls=http://node1:14001
+                    --initial-advertise-peer-urls=http://node1:17001
+                    --discovery ${ETCD_DISCOVERY}
+        restart: always
+        volumes:
+            - /mnt/data/ct/etcd1:/opt/etcd/data
+        extra_hosts:
+            - "node1:192.168.11.65"
+            - "node2:192.168.11.65"
+            - "node3:192.168.11.65"
+    etcd2:
+        image: ct_etcd
+        ports:
+            - "14002:2379"
+            - "17002:2380"
+        environment:
+            - ETCD_DISCOVERY
+        command: etcd
+                    --name=etcd-node-2
+                    --data-dir=/opt/etcd/data
+                    --heartbeat-interval=100
+                    --election-timeout=6000
+                    --listen-peer-urls=http://0.0.0.0:2380
+                    --listen-client-urls=http://0.0.0.0:2379
+                    --advertise-client-urls=http://node2:14002
+                    --initial-advertise-peer-urls=http://node2:17002
+                    --discovery ${ETCD_DISCOVERY}
+        restart: always
+        volumes:
+            - /mnt/data/ct/etcd2:/opt/etcd/data
+        extra_hosts:
+            - "node1:192.168.11.65"
+            - "node2:192.168.11.65"
+            - "node3:192.168.11.65"
+    etcd3:
+        image: ct_etcd
+        ports:
+            - "14003:2379"
+            - "17003:2380"
+        environment:
+            - ETCD_DISCOVERY
+        command: etcd
+                    --name=etcd-node-3
+                    --data-dir=/opt/etcd/data
+                    --heartbeat-interval=100
+                    --election-timeout=6000
+                    --listen-peer-urls=http://0.0.0.0:2380
+                    --listen-client-urls=http://0.0.0.0:2379
+                    --advertise-client-urls=http://node3:14003
+                    --initial-advertise-peer-urls=http://node3:17003
+                    --discovery ${ETCD_DISCOVERY}
+        restart: always
+        volumes:
+            - /mnt/data/ct/etcd3:/opt/etcd/data
+        extra_hosts:
+            - "node1:192.168.11.65"
+            - "node2:192.168.11.65"
+            - "node3:192.168.11.65"
+    prom:
+        image: ct_prom
+        ports:
+            - "19090:9090"
+        environment:
+            - PROMETHEUS_STORAGE=/prometheus/data
+            - PROMETHEUS_CONFIG=/etc/prometheus/prometheus.yaml
+        volumes:
+            - /mnt/data/ct/prom:/prometheus/data
+        extra_hosts:            
+            - "node1:192.168.11.65"
+            - "node2:192.168.11.65"
+            - "node3:192.168.11.65"
+        restart: always

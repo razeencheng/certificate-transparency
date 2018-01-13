@@ -1,0 +1,12 @@
+FROM prom/prometheus:v1.0.0
+
+COPY prometheus.yaml /etc/prometheus/prometheus.yaml
+ENTRYPOINT echo "Config: ${PROMETHEUS_CONFIG}" && \
+    cat ${PROMETHEUS_CONFIG} && \
+    echo "Storage: ${PROMETHEUS_STORAGE}" && \
+    /bin/prometheus \
+      -config.file=${PROMETHEUS_CONFIG} \
+      -storage.local.path=${PROMETHEUS_STORAGE} 
+
+CMD []
+
